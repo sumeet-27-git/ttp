@@ -1,0 +1,47 @@
+import tensorflow as tf
+from tensorflow.python import metrics
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import *
+from tensorflow.keras.datasets import boston_housing
+
+
+import pandas as pd
+from sklearn import preprocessing
+
+(train_x,train_y),(test_x,test_y)=boston_housing.load_data()
+
+df = boston_housing.load_data()
+df
+
+print("train shape: ",train_x.shape)
+print("test shape: ",test_x.shape)
+print("actual train output:",train_y.shape)
+print("actual test output:",test_y.shape)
+
+#normalization for preprocessing
+train_x=preprocessing.normalize(train_x)
+test_x=preprocessing.normalize(test_x)
+
+
+def HousePricePredictionModel():  
+	model=Sequential()
+	model.add(Dense(128,activation='relu',input_shape=(train_x[0].shape)))
+	model.add(Dense(64,activation='relu'))
+	model.add(Dense(32,activation='relu'))
+	model.add(Dense(1))
+	model.compile(optimizer='adam',loss='mse',metrics=['mae'])
+	return model
+
+import numpy as np
+k=4
+num_val_samples=len(train_x)
+num_epochs=100
+all_scores=[]
+
+
+model= HousePricePredictionModel()
+history=model.fit(x=train_x,y=train_y,epochs=num_epochs,batch_size=1,verbose=1,validation_data=(test_x,test_y))
+
+mse, mae = model.evaluate(test_x, test_y)
+print('Mean squared error on test data: ', mse)
+print('Mean absolute error on test data: ', mae)
